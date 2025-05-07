@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fingerprintjs/fingerprintjs": "^4.6.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

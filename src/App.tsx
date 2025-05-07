@@ -1,6 +1,37 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
+
+// --- DeviceUUID adapted for React ---
+function hashMD5(str: string) {
+  // Simple hash fallback (not real MD5, for demo only)
+  let hash = 0, i, chr;
+  if (str.length === 0) return '00000000';
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).padStart(8, '0').repeat(4).slice(0, 32);
+}
+
+function getDeviceUUID() {
+  // Hanya gunakan data yang kemungkinan besar sama di semua browser pada device yang sama
+  const screenRes = window.screen.width + 'x' + window.screen.height;
+  const colorDepth = window.screen.colorDepth;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const language = navigator.language;
+  // Jangan gunakan userAgent, platform, dsb!
+  const dua = [screenRes, colorDepth, timezone, language].join(':');
+  const tmpUuid = hashMD5(dua);
+  const uuid = [
+    tmpUuid.slice(0, 8),
+    tmpUuid.slice(8, 12),
+    '4' + tmpUuid.slice(12, 15),
+    'b' + tmpUuid.slice(15, 18),
+    tmpUuid.slice(20)
+  ].join('-');
+  return uuid;
+}
 
 // Helper untuk cookies
 function setCookie(name: string, value: string, days = 365) {
@@ -51,116 +82,21 @@ function getIndexedDB(key: string, callback: (value: string | null) => void) {
 }
 
 function App() {
-  const [deviceInfo, setDeviceInfo] = useState({
-    browser: '',
-    os: '',
-    deviceType: '',
-    deviceId: ''
-  })
+  const [deviceUUID, setDeviceUUID] = useState('');
 
   useEffect(() => {
-    const storageKey = 'deviceId';
-
-    // Cek semua storage
-    const getFromAllStorage = (callback: (id: string | null) => void) => {
-      let id = localStorage.getItem(storageKey)
-        || sessionStorage.getItem(storageKey)
-        || getCookie(storageKey);
-
-      if (id) {
-        callback(id);
-      } else {
-        getIndexedDB(storageKey, (idbId: string | null) => {
-          callback(idbId);
-        });
-      }
-    };
-
-    // Simpan ke semua storage
-    const saveToAllStorage = (id: string) => {
-      localStorage.setItem(storageKey, id);
-      sessionStorage.setItem(storageKey, id);
-      setCookie(storageKey, id);
-      setIndexedDB(storageKey, id);
-    };
-
-    // Function to detect device type (improved)
-    const getDeviceType = () => {
-      const ua = navigator.userAgent.toLowerCase();
-      if (/iphone/.test(ua)) return 'iPhone';
-      if (/ipad/.test(ua)) return 'iPad';
-      if (/ipod/.test(ua)) return 'iPod';
-      if (/android/.test(ua)) {
-        if (/samsung/.test(ua)) return 'Samsung';
-        if (/xiaomi/.test(ua)) return 'Xiaomi';
-        if (/huawei/.test(ua)) return 'Huawei';
-        if (/oppo/.test(ua)) return 'Oppo';
-        if (/vivo/.test(ua)) return 'Vivo';
-        return 'Android Device';
-      }
-      if (/windows phone/.test(ua)) return 'Windows Phone';
-      if (/macintosh|mac os x/.test(ua)) return 'Mac';
-      if (/windows/.test(ua)) return 'Windows PC';
-      return 'Unknown Device';
-    }
-
-    // Function to detect OS
-    const getOS = () => {
-      const ua = navigator.userAgent.toLowerCase()
-      if (ua.includes('android')) return 'Android'
-      if (ua.includes('iphone') || ua.includes('ipad')) return 'iOS'
-      return 'Unknown OS'
-    }
-
-    // Function to detect browser (improved for iOS)
-    const getBrowser = () => {
-      const ua = navigator.userAgent;
-      if (/CriOS/i.test(ua)) return 'Chrome (iOS)';
-      if (/FxiOS/i.test(ua)) return 'Firefox (iOS)';
-      if (/EdgiOS/i.test(ua)) return 'Edge (iOS)';
-      if (/OPiOS/i.test(ua)) return 'Opera (iOS)';
-      if (/Chrome/i.test(ua)) return 'Chrome';
-      if (/Firefox/i.test(ua)) return 'Firefox';
-      if (/Edg/i.test(ua)) return 'Edge';
-      if (/Opera|OPR/i.test(ua)) return 'Opera';
-      if (/Safari/i.test(ua)) return 'Safari';
-      return 'Unknown Browser';
-    }
-
-    getFromAllStorage(async (existingId: string | null) => {
-      if (existingId) {
-        setDeviceInfo({
-          browser: getBrowser(),
-          os: getOS(),
-          deviceType: getDeviceType(),
-          deviceId: existingId
-        });
-      } else {
-        const fp = await FingerprintJS.load();
-        const result = await fp.get();
-        saveToAllStorage(result.visitorId);
-        setDeviceInfo({
-          browser: getBrowser(),
-          os: getOS(),
-          deviceType: getDeviceType(),
-          deviceId: result.visitorId
-        });
-      }
-    });
-  }, [])
+    setDeviceUUID(getDeviceUUID());
+  }, []);
 
   return (
     <div className="device-info-container">
       <h1>Device Information</h1>
       <div className="info-card">
-        <h2>Browser Information</h2>
-        <p><strong>Browser:</strong> {deviceInfo.browser}</p>
-        <p><strong>Operating System:</strong> {deviceInfo.os}</p>
-        <p><strong>Device Type:</strong> {deviceInfo.deviceType}</p>
-        <p><strong>Unique Device ID:</strong> {deviceInfo.deviceId}</p>
+        <h2>Device UUID</h2>
+        <p><strong>Device UUID:</strong> {deviceUUID}</p>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
