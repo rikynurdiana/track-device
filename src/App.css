@@ -1,0 +1,107 @@
+body, #root {
+  background: #f7f7f7;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.device-info-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f7f7f7;
+}
+
+.info-card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 28px 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  margin-top: 20px;
+}
+
+.info-card h2 {
+  color: #222;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.info-card p {
+  margin: 16px 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #222;
+}
+
+.info-card strong {
+  color: #444;
+  margin-right: 10px;
+  font-weight: 600;
+}
+
+h1 {
+  color: #111;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .device-info-container {
+    max-width: 98vw;
+    padding: 8px;
+  }
+  .info-card {
+    padding: 16px 6px;
+  }
+  h1 {
+    font-size: 1.4rem;
+  }
+  .info-card h2 {
+    font-size: 1.1rem;
+  }
+  .info-card p {
+    font-size: 1rem;
+  }
+}
