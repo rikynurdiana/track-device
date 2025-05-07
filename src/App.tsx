@@ -12,12 +12,24 @@ function hashMD5(str: string) {
   return Math.abs(hash).toString(16).padStart(8, '0').repeat(4).slice(0, 32);
 }
 
+function roundToNearest(value: number, nearest: number) {
+  return Math.round(value / nearest) * nearest;
+}
+
 function getDeviceUUID() {
-  const screenRes = window.screen.width + 'x' + window.screen.height;
-  const colorDepth = window.screen.colorDepth;
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const language = navigator.language;
-  const dua = [screenRes, colorDepth, timezone, language].join(':');
+  const width = roundToNearest(
+    Math.max(window.screen.width, window.screen.availWidth, window.innerWidth),
+    100
+  );
+  const height = roundToNearest(
+    Math.max(window.screen.height, window.screen.availHeight, window.innerHeight),
+    100
+  );
+  const screenRes = width + 'x' + height;
+  const colorDepth = 24;
+  const cpu = 4;
+  const dpr = '1.00';
+  const dua = [screenRes, colorDepth, cpu, dpr].join(':');
   const tmpUuid = hashMD5(dua);
   const uuid = [
     tmpUuid.slice(0, 8),
