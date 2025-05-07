@@ -33,54 +33,6 @@ function getDeviceUUID() {
   return uuid;
 }
 
-// Helper untuk cookies
-function setCookie(name: string, value: string, days = 365) {
-  const expires = new Date(Date.now() + days*24*60*60*1000).toUTCString();
-  document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-}
-function getCookie(name: string): string | null {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? match[2] : null;
-}
-
-// Helper untuk IndexedDB
-function setIndexedDB(key: string, value: string) {
-  const request = window.indexedDB.open('DeviceDB', 1);
-  request.onupgradeneeded = function(event) {
-    const db = (event.target as IDBOpenDBRequest).result;
-    if (!db.objectStoreNames.contains('deviceStore')) {
-      db.createObjectStore('deviceStore');
-    }
-  };
-  request.onsuccess = function(event) {
-    const db = (event.target as IDBOpenDBRequest).result;
-    const tx = db.transaction('deviceStore', 'readwrite');
-    tx.objectStore('deviceStore').put(value, key);
-  };
-}
-function getIndexedDB(key: string, callback: (value: string | null) => void) {
-  const request = window.indexedDB.open('DeviceDB', 1);
-  request.onsuccess = function(event) {
-    const db = (event.target as IDBOpenDBRequest).result;
-    if (!db.objectStoreNames.contains('deviceStore')) {
-      callback(null);
-      return;
-    }
-    const tx = db.transaction('deviceStore', 'readonly');
-    const store = tx.objectStore('deviceStore');
-    const getReq = store.get(key);
-    getReq.onsuccess = function() {
-      callback(getReq.result ?? null);
-    };
-    getReq.onerror = function() {
-      callback(null);
-    };
-  };
-  request.onerror = function() {
-    callback(null);
-  };
-}
-
 function App() {
   const [deviceUUID, setDeviceUUID] = useState('');
 
